@@ -1,0 +1,25 @@
+{
+  "name": "checking_app",
+  "version": "0.0.0",
+  "description": "an api for a checking app using hapi",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pbj23000/checking_app.git"
+  },
+  "keywords": [
+    "checking",
+    "api",
+    "hapi"
+  ],
+  "author": "pbj23000@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pbj23000/checking_app/issues"
+  },
+  "homepage": "https://github.com/pbj23000/checking_app"
+}
