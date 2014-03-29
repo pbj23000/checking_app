@@ -1,18 +1,63 @@
 var Hapi = require('hapi');
+var mongoose = require('mongoose');
+var Check = require('./lib/models/Check');
 
 // Create a server with a port
 var server = Hapi.createServer('localhost', 8000);
 
-// Add a top level handler
-var status = function (request, reply) {
-    reply({ status: 'ok'});
-};
+// route configs
+var status = {
+    handler: function (request, reply) {
+        reply({ status: 'ok' });
+    }
+}
 
-// Add a handler in config
-var user = {
+var writeCheck = {
+    handler: function (request, reply) {
+        var check = new Check({
+            checkNumber: request.payload.number,
+            checkDate: request.payload.date,
+            checkAmount: request.payload.amount,
+            checkPayee: request.payload.payee,
+            checkMemo: request.payload.memo
+        });
+        check.save(function (err, objToSave) {
+            if (err) { 
+                console.log("error: " + err);
+                return reply.error(err);
+            }
+        });
+        reply().created('/checks/' + check._id);
+    }
+}
+
+var findCheck = {
     cache: { expiresIn: 5000 },
     handler: function (request, reply) {
-        reply({ name: 'John' });
+        Check.findOne({ checkNumber: request.params.number })
+            .select('checkNumber checkDate checkPayee checkAmount checkMemo')
+            .exec(function (err, check) {
+                if (err) {
+                    console.log("error: " + err); 
+                    return reply.error(err);
+                }
+                reply(check);
+            });
+    }
+}
+
+var findAllChecks = {
+    cache: { expiresIn: 6000 },
+    handler: function (request, reply) {
+        Check.find()
+            .select('checkNumber checkDate checkPayee checkAmount checkMemo')
+            .exec(function (err, checks) {
+                if (err) {
+                    console.log("error: " + err);
+                    return reply.error(err);
+                }
+                reply(checks);
+            });
     }
 }
 
@@ -20,26 +65,23 @@ var user = {
 server.route([
     {
         method: 'GET',
-        path: '/hello',
-        handler: function (request, reply) {
-            reply('hello world');
-        }
-    }, {
-        method: 'GET',
-        path: '/hello/{name}',
-        handler: function (request, reply) {
-            reply('hello ' + request.params.name);
-        }
-    }, {
-        method: 'GET',
         path: '/status',
-        handler: status
+        config: status
+    }, {
+        method: 'POST',
+        path: '/checks',
+        config: writeCheck                    
     }, {
         method: 'GET',
-        path: '/user',
-        config: user
+        path: '/checks/{number}',
+        config: findCheck            
+    }, {
+        method: 'GET',
+        path: '/checks',
+        config: findAllChecks
     }
 ]);
 
 // Start the server
+mongoose.connect('mongodb://localhost/checks');
 server.start();
