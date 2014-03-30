@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/pbj23000/checking_app",
   "dependencies": {
+    "furball": "^1.0.1",
     "hapi": "^3.1.0",
     "mongoose": "^3.8.8"
   }

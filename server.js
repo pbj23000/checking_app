@@ -5,6 +5,13 @@ var Check = require('./lib/models/Check');
 // Create a server with a port
 var server = Hapi.createServer('localhost', 8000);
 
+// install plugins
+server.pack.require('furball', function(err) {
+    if (err) {
+        console.log('Failed to load furball plugin');
+    }
+});
+
 // route configs
 var status = {
     handler: function (request, reply) {
