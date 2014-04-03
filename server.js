@@ -19,10 +19,14 @@ var plugins = {
     travelogue: {
         hostname: 'localhost',
         port: 8000
+    },
+    good: {
+        subscribers: {
+            'console': ['ops', 'request', 'log', 'error'],
+            './tmp/logs/': ['request', 'log']
+        }
     }
 }
-
-
 
 // routes config
 var status = {
@@ -104,7 +108,6 @@ server.pack.require(plugins, function(err) {
 
 // auth config
 server.auth.strategy('passport', 'passport');
-
 var Passport = server.plugins.travelogue.passport;
 Passport.use(new BasicStrategy(
     function(username, password, done) {

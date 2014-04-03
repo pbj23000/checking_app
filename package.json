@@ -29,6 +29,7 @@
     "travelogue": "^1.1.0",
     "mongoose": "^3.8.8",
     "furball": "^1.0.1",
-    "passport-http": "^0.2.2"
+    "passport-http": "^0.2.2",
+    "good": "^2.0.0"
   }
 }
