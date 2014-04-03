@@ -1,0 +1,4 @@
+{ "requests": [
+    {"method": "get", "path": "/checks/100"},
+    {"method": "get", "path": "/checks/101"}
+] }

@@ -25,7 +25,8 @@ var plugins = {
             'console': ['ops', 'request', 'log', 'error'],
             './tmp/logs/': ['request', 'log']
         }
-    }
+    },
+    bassmaster: { }
 }
 
 // routes config
@@ -65,7 +66,7 @@ var findCheck = {
     handler: function (request, reply) {
         Passport.authenticate('basic', {session: false })(request, reply, function() {
             Check.findOne({ checkNumber: request.params.number })
-                .select('checkNumber checkDate checkPayee checkAmount checkMemo')
+                .select('checkNumber checkDate checkPayee checkAmount checkMemo checkReconciled')
                 .exec(function (err, check) {
                     if (err) {
                         console.log("error: " + err); 
@@ -83,14 +84,53 @@ var findAllChecks = {
     handler: function (request, reply) {
         Passport.authenticate('basic', { session: false })(request, reply, function () {
             Check.find()
-                .select('checkNumber checkDate checkPayee checkAmount checkMemo')
+                .select('checkNumber checkDate checkPayee checkAmount checkMemo checkReconciled')
                 .exec(function (err, checks) {
                     if (err) {
-                        console.log("error: " + err);
+                        console.log("error: ", err);
                         return reply.error(err);
                     }
                     reply(checks);
                 });
+        });
+    }
+}
+
+var reconcileCheck = {
+    auth: false,
+    handler: function (request, reply) {
+        Passport.authenticate('basic', { session: false })(request, reply, function () {
+            Check.findOneAndUpdate({ checkNumber: request.params.number }, { reconciled: true, reconciledDate: Date.Now }, { select: 'reconciled recociledDate' }, function (res) {
+                request.reply(res.result):
+            });
+        });
+    }
+}
+
+var voidCheck = {
+    auth: false,
+    handler: function (request, reply) {
+        Passport.authenticate('basic', { session: false })(request, reply, function () {
+            Check.findOneAndRemove({ checkNumber: request.params.number }, function (res) {
+                request.reply(res.result);
+            });
+        });
+    }
+}
+
+var reconcile = {
+    auth: false,
+    handler: function (request, reply) {
+        Passport.authenticate('basic', { session: false })(request, reply, function () {
+            
+            server.inject({
+                method: 'POST',
+                url: '/batch',
+                payload: '{ "requests": [{ "method": "get", "path": "/status" }, { "method": "get", "path": "/checks" }, { "method": "get", "path": "/checks/$1.id" }] }'
+            }, function (res) {
+                
+                request.reply(res.result);
+            });
         });
     }
 }
@@ -138,6 +178,10 @@ server.route([
         method: 'GET',
         path: '/checks',
         config: findAllChecks
+    }, {
+        method: 'GET',
+        path: '/reconcile',
+        config: reconcile
     }
 ]);
 
