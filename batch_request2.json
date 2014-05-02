@@ -1,0 +1,4 @@
+{ "requests": [
+    {"method": "get", "path": "/users/1"},
+    {"method": "get", "path": "/users/2"}
+] }

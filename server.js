@@ -100,8 +100,8 @@ var reconcileCheck = {
     auth: false,
     handler: function (request, reply) {
         Passport.authenticate('basic', { session: false })(request, reply, function () {
-            Check.findOneAndUpdate({ checkNumber: request.params.number }, { reconciled: true, reconciledDate: Date.Now }, { select: 'reconciled recociledDate' }, function (res) {
-                request.reply(res.result):
+            Check.findOneAndUpdate({ checkNumber: request.params.number }, { reconciled: true, reconciledDate: Date.Now }, { select: 'checkNumber checkDate checkPayee checkAmount checkMemo reconciled reconciledDate' }, function (res) {
+                request.reply(res.result);
             });
         });
     }
@@ -179,9 +179,9 @@ server.route([
         path: '/checks',
         config: findAllChecks
     }, {
-        method: 'GET',
-        path: '/reconcile',
-        config: reconcile
+        method: 'PUT',
+        path: '/reconcile/{number}',
+        config: reconcileCheck
     }
 ]);
 
